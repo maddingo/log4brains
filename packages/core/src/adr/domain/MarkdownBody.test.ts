@@ -1,3 +1,4 @@
+import { FilesystemPath } from "./FilesystemPath";
 import { MarkdownBody } from "./MarkdownBody";
 
 describe("MarkdownBody", () => {
@@ -292,6 +293,87 @@ Lorem ipsum
 - Link2
 
 `);
+    });
+  });
+
+  describe("replaceLocalImages()", () => {
+    const myBasePath = new FilesystemPath("/root", "path/to/adrs");
+
+    it("replaces a simple image", () => {
+      const body = new MarkdownBody("![](test.png)").setMyBasePath(myBasePath);
+      body.replaceLocalImages();
+      expect(body.getRawMarkdown()).toEqual(
+        '<LocalImage pathFromCwd="path/to/adrs/test.png" alt="" />'
+      );
+    });
+
+    it("replaces an image with an alt", () => {
+      const body = new MarkdownBody(
+        '![This is a "test" !](test.png)'
+      ).setMyBasePath(myBasePath);
+      body.replaceLocalImages();
+      expect(body.getRawMarkdown()).toEqual(
+        '<LocalImage pathFromCwd="path/to/adrs/test.png" alt="This is a &quot;test&quot; !" />'
+      );
+    });
+
+    it("does not replace a remote image", () => {
+      const body = new MarkdownBody(
+        "![](https://test.com/test.png)"
+      ).setMyBasePath(myBasePath);
+      body.replaceLocalImages();
+      expect(body.getRawMarkdown()).toEqual("![](https://test.com/test.png)");
+    });
+
+    it("replaces an image up to the Log4brains workdir", () => {
+      const body = new MarkdownBody("![](../../../test.png)").setMyBasePath(
+        myBasePath
+      );
+      body.replaceLocalImages();
+      expect(body.getRawMarkdown()).toEqual(
+        '<LocalImage pathFromCwd="test.png" alt="" />'
+      );
+    });
+
+    it("does not replace an image outisde of the Log4brains workdir", () => {
+      const body = new MarkdownBody("![](../../../../test.png)").setMyBasePath(
+        myBasePath
+      );
+      body.replaceLocalImages();
+      expect(body.getRawMarkdown()).toEqual("![](../../../../test.png)");
+    });
+
+    it("replaces an image with a link", () => {
+      const body = new MarkdownBody(
+        "[![This is a test!](test.png)](https://test.com/)"
+      ).setMyBasePath(myBasePath);
+      body.replaceLocalImages();
+      expect(body.getRawMarkdown()).toEqual(
+        '[<LocalImage pathFromCwd="path/to/adrs/test.png" alt="This is a test!" />](https://test.com/)'
+      );
+    });
+  });
+
+  describe("getLocalImagesRelativePaths()", () => {
+    const myBasePath = new FilesystemPath("/root", "path/to/adrs");
+
+    it("retreives the local images relative paths", () => {
+      const body = new MarkdownBody(`# Test
+
+- ![](test.png)
+- Duplicate: ![](test.png)
+- Duplicate with alt: ![This is a "test" !](test.png)
+- ![Foo](test/bar.png)
+- ![](https://test.com/test.png)
+- ![](../../../subimage.png)
+- ![](../../../../image-outside-of-scope.png)
+
+`).setMyBasePath(myBasePath);
+      expect(body.getLocalImagesPaths()).toEqual([
+        myBasePath.join("test.png"),
+        myBasePath.join("test/bar.png"),
+        myBasePath.join("../../../subimage.png")
+      ]);
     });
   });
 });

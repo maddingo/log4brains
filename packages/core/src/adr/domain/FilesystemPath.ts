@@ -52,6 +52,17 @@ export class FilesystemPath extends ValueObject<Props> {
     );
   }
 
+  isInsideCwd(): boolean {
+    return this.absolutePath.startsWith(this.cwdAbsolutePath);
+  }
+
+  back(): FilesystemPath {
+    return new FilesystemPath(
+      this.cwdAbsolutePath,
+      path.dirname(this.pathRelativeToCwd)
+    );
+  }
+
   join(p: string): FilesystemPath {
     return new FilesystemPath(
       this.cwdAbsolutePath,

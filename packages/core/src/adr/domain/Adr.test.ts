@@ -1,7 +1,9 @@
 import moment from "moment-timezone";
 import { Adr } from "./Adr";
+import { AdrFile } from "./AdrFile";
 import { AdrSlug } from "./AdrSlug";
 import { AdrStatus } from "./AdrStatus";
+import { FilesystemPath } from "./FilesystemPath";
 import { MarkdownAdrLink } from "./MarkdownAdrLink";
 import { MarkdownBody } from "./MarkdownBody";
 
@@ -247,6 +249,42 @@ Link to an unknown ADR: [lorem ipsum](unknown.md).
 Link to an other file: [lorem ipsum](test.html).
 Link to an URL: [lorem ipsum](https://www.google.com/).
 `);
+    });
+
+    test("local images replacement and retreival", async () => {
+      const adr = new Adr({
+        slug: new AdrSlug("test"),
+        file: new AdrFile(
+          new FilesystemPath("/root", "path/to/adrs/my-adr.md")
+        ),
+        body: new MarkdownBody(`## Subtitle
+
+- ![](test.png)
+- Duplicate: ![](test.png)
+- Duplicate with alt: ![This is a "test" !](test.png)
+- ![Foo](test/bar.png)
+- ![](https://test.com/test.png)
+- ![](../../../subimage.png)
+- ![](../../../../image-outside-of-scope.png)
+`)
+      });
+
+      expect(await adr.getEnhancedMdx()).toEqual(`## Subtitle
+
+- <LocalImage pathFromCwd="path/to/adrs/test.png" alt="" />
+- Duplicate: <LocalImage pathFromCwd="path/to/adrs/test.png" alt="" />
+- Duplicate with alt: <LocalImage pathFromCwd="path/to/adrs/test.png" alt="This is a &quot;test&quot; !" />
+- <LocalImage pathFromCwd="path/to/adrs/test/bar.png" alt="Foo" />
+- ![](https://test.com/test.png)
+- <LocalImage pathFromCwd="subimage.png" alt="" />
+- ![](../../../../image-outside-of-scope.png)
+`);
+
+      expect(adr.getLocalImagesPaths()).toEqual([
+        adr.file?.path.back().join("test.png"),
+        adr.file?.path.back().join("test/bar.png"),
+        adr.file?.path.back().join("../../../subimage.png")
+      ]);
     });
   });
 

@@ -7,6 +7,7 @@ import type { MarkdownBody } from "./MarkdownBody";
 import { PackageRef } from "./PackageRef";
 import { AdrRelation } from "./AdrRelation";
 import { Author } from "./Author";
+import { FilesystemPath } from "./FilesystemPath";
 
 // TODO: make this configurable
 const dateFormats = ["YYYY-MM-DD", "DD/MM/YYYY"];
@@ -203,7 +204,23 @@ export class Adr extends AggregateRoot<Props> {
     // Replace links
     await bodyCopy.replaceAdrLinks(this);
 
+    // Replace local images
+    if (this.file) {
+      bodyCopy.setMyBasePath(this.file.path.back());
+    }
+    bodyCopy.replaceLocalImages();
+
     return bodyCopy.getRawMarkdown();
+  }
+
+  getLocalImagesPaths(): FilesystemPath[] {
+    if (!this.file) {
+      throw new Log4brainsError(
+        "Cannot call getLocalImagesPaths() on an usaved ADR"
+      );
+    }
+    this.body.setMyBasePath(this.file.path.back());
+    return this.body.getLocalImagesPaths();
   }
 
   static compare(a: Adr, b: Adr): number {

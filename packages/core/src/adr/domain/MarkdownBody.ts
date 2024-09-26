@@ -3,6 +3,7 @@ import { Entity, Log4brainsError } from "@src/domain";
 import { CheerioMarkdown, cheerioToMarkdown } from "@src/lib/cheerio-markdown";
 import type { Adr } from "./Adr";
 import { MarkdownAdrLinkResolver } from "./MarkdownAdrLinkResolver";
+import { FilesystemPath } from "./FilesystemPath";
 
 type Props = {
   value: string;
@@ -18,6 +19,12 @@ type Link = {
   href: string;
 };
 
+type Img = {
+  src: string;
+  alt: string;
+  path: FilesystemPath;
+};
+
 function htmlentities(str: string): string {
   return str
     .replace(/&/g, "&amp;")
@@ -26,10 +33,14 @@ function htmlentities(str: string): string {
     .replace(/"/g, "&quot;");
 }
 
+const isUrlRegexp = new RegExp(/^https?:\/\//i);
+
 export class MarkdownBody extends Entity<Props> {
   private cm: CheerioMarkdown;
 
   private adrLinkResolver?: MarkdownAdrLinkResolver;
+
+  private myBasePath?: FilesystemPath;
 
   constructor(value: string) {
     super({ value });
@@ -41,6 +52,11 @@ export class MarkdownBody extends Entity<Props> {
 
   setAdrLinkResolver(resolver: MarkdownAdrLinkResolver): MarkdownBody {
     this.adrLinkResolver = resolver;
+    return this;
+  }
+
+  setMyBasePath(path: FilesystemPath): MarkdownBody {
+    this.myBasePath = path;
     return this;
   }
 
@@ -199,8 +215,6 @@ export class MarkdownBody extends Entity<Props> {
       }))
       .get() as Link[];
 
-    const isUrlRegexp = new RegExp(/^https?:\/\//i);
-
     const promises = links
       .filter((link) => !isUrlRegexp.exec(link.href))
       .filter((link) => link.href.toLowerCase().endsWith(".md"))
@@ -244,5 +258,63 @@ export class MarkdownBody extends Entity<Props> {
       );
 
     await Promise.all(promises);
+  }
+
+  private getLocalImages(): Img[] {
+    if (this.myBasePath === undefined) {
+      return []; // while myBasePath is not set, we cannot lookup for local images
+    }
+
+    const images = this.cm
+      .$("img")
+      .map((_, element) => ({
+        src: this.cm.$(element).attr("src"),
+        alt: this.cm.$(element).attr("alt")
+      }))
+      .get() as Img[];
+
+    return images
+      .filter((image) => !isUrlRegexp.exec(image.src))
+      .map((image) => {
+        return {
+          ...image,
+          path: this.myBasePath?.join(image.src)
+        };
+      })
+      .filter((image) => image.path && image.path.isInsideCwd()) as Img[]; // we don't allow sourcing images outside of the Log4brains workdir
+  }
+
+  replaceLocalImages(): void {
+    this.getLocalImages().forEach((image) => {
+      const params = [
+        `pathFromCwd="${htmlentities(image.path.pathRelativeToCwd)}"`,
+        `alt="${htmlentities(image.alt)}"`
+      ];
+      this.cm.updateMarkdown(
+        this.cm.markdown.replace(
+          `![${image.alt}](${image.src})`,
+          `<LocalImage ${params.join(" ")} />`
+        )
+      );
+    });
+  }
+
+  getLocalImagesPaths(): FilesystemPath[] {
+    if (this.myBasePath === undefined) {
+      throw new Log4brainsError(
+        "Please call setMyBasePath() before calling getLocalImagesPaths()"
+      );
+    }
+
+    const absolutePaths = new Set<string>();
+    return this.getLocalImages()
+      .map((image) => image.path)
+      .filter((p) => {
+        if (absolutePaths.has(p.absolutePath)) {
+          return false;
+        }
+        absolutePaths.add(p.absolutePath);
+        return true;
+      });
   }
 }

@@ -40,6 +40,14 @@ describe("FilesystemPath", () => {
     ).toEqual("test");
   });
 
+  it("tests inside the CWD", () => {
+    expect(new FilesystemPath("/foo", "bar").isInsideCwd()).toBeTruthy();
+  });
+
+  it("tests outside the CWD", () => {
+    expect(new FilesystemPath("/foo", "../bar").isInsideCwd()).toBeFalsy();
+  });
+
   it("joins a FilesystemPath to a string path", () => {
     expect(
       new FilesystemPath("/foo", "bar/test").join("hello-world.md").absolutePath
