@@ -80,8 +80,8 @@ jobs:
         with:
           fetch-depth: 0 # fetch all history to make Jest snapshot tests work
 
-      - name: fetch branch master
-        run: git fetch origin master
+      - name: fetch branch develop
+        run: git fetch origin develop
 
       # Beginning of yarn setup [KEEP IN SYNC BETWEEN ALL WORKFLOWS] (copy/paste of the snippet above)
       - name: use node.js ${{ matrix.node-version }}
@@ -114,7 +114,7 @@ jobs:
 
       - name: check for yarn.lock changes
         id: yarn-lock
-        run: git diff --quiet origin/master HEAD -- yarn.lock
+        run: git diff --quiet origin/develop HEAD -- yarn.lock
         continue-on-error: true
       #  - steps.yarn-lock.outcome == 'success' --> yarn.lock was not changed
       #  - steps.yarn-lock.outcome == 'failure' --> yarn.lock was changed
@@ -134,7 +134,7 @@ jobs:
 
       - name: test changed packages
         if: ${{ steps.yarn-lock.outcome == 'success' }}
-        run: yarn test --since origin/master
+        run: yarn test --since origin/develop
 
       - name: test all packages
         if: ${{ steps.yarn-lock.outcome == 'failure' }}

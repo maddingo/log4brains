@@ -17,7 +17,7 @@ import {
 } from "./commands";
 
 const templateExampleUrl =
-  "https://raw.githubusercontent.com/thomvaill/log4brains/master/packages/init/assets/template.md";
+  "https://raw.githubusercontent.com/thomvaill/log4brains/stable/packages/init/assets/template.md";
 
 function findRootFolder(cwd: string): string {
   if (fs.existsSync(path.join(cwd, ".log4brains.yml"))) {

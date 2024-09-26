@@ -19,7 +19,7 @@ Moreover, maintaining this documentation aims at:
 
 ## Usage
 
-This website is automatically updated after a change on the `master` branch of the project's Git repository.
+This website is automatically updated after a change on the `main` branch of the project's Git repository.
 In fact, the developers manage this documentation directly with markdown files located next to their code, so it is more convenient for them to keep it up-to-date.
 You can browse the ADRs by using the left menu or the search bar.
 
@@ -31,6 +31,6 @@ The decision process is entirely collaborative and backed by pull requests.
 
 ## More information
 
-- [Log4brains documentation](https://github.com/thomvaill/log4brains/tree/master#readme)
-- [What is an ADR and why should you use them](https://github.com/thomvaill/log4brains/tree/master#-what-is-an-adr-and-why-should-you-use-them)
+- [Log4brains documentation](https://github.com/thomvaill/log4brains/tree/develop#readme)
+- [What is an ADR and why should you use them](https://github.com/thomvaill/log4brains/tree/develop#-what-is-an-adr-and-why-should-you-use-them)
 - [ADR GitHub organization](https://adr.github.io/)

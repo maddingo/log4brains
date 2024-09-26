@@ -11,4 +11,4 @@ npm install -g log4brains
 
 ## Documentation
 
-- [Log4brains README](https://github.com/thomvaill/log4brains/blob/master/README.md)
+- [Log4brains README](https://github.com/thomvaill/log4brains/blob/develop/README.md)

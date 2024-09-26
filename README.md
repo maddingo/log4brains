@@ -2,12 +2,12 @@
 
 <p align="center">
   <a href="#readme">
-    <img src="https://github.com/thomvaill/log4brains/raw/master/docs/Log4brains-logo-full.png" alt="Log4brains logo" width="276" />
+    <img src="https://github.com/thomvaill/log4brains/raw/develop/docs/Log4brains-logo-full.png" alt="Log4brains logo" width="276" />
   </a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/thomvaill/log4brains/blob/master/LICENSE">
+  <a href="https://github.com/thomvaill/log4brains/blob/develop/LICENSE">
     <img src="https://img.shields.io/badge/license-Apache%202-blue" alt="License" />
   </a>
   <a href="https://github.com/thomvaill/log4brains/actions?query=workflow%3ABuild">
@@ -64,7 +64,7 @@ By logging your decisions chronologically, you will be able to:
 <br />
 <p align="center">
   <a href="https://www.youtube.com/watch?v=HDEwOCn9T0w" title="Click to watch the full screencast">
-    <img src="https://github.com/thomvaill/log4brains/raw/master/docs/demo.gif" alt="Log4brains demo" width="838" />
+    <img src="https://github.com/thomvaill/log4brains/raw/develop/docs/demo.gif" alt="Log4brains demo" width="838" />
   </a>
 </p>
 <p align="center"><a href="https://www.youtube.com/watch?v=HDEwOCn9T0w">🎞️ Watch the full screencast</a> - <a href="https://thomvaill.github.io/log4brains/adr/">⚡ See an example (Log4brains' own ADRs)</a></p>
@@ -93,7 +93,7 @@ in the same git repository, to keep them in sync.
 To get started, run these commands inside your project root folder:
 
 ```bash
-npm install -g log4brains
+npm install -g log4brains # if you want to install the latest beta version, run `npm install -g log4brains@beta` instead
 log4brains init
 ```
 
@@ -163,7 +163,7 @@ name: Publish Log4brains
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
@@ -208,7 +208,7 @@ Finally, you can [enable your GitHub page](https://docs.github.com/en/free-pro-t
 - Then, select the `/ (root)` folder
 
 You should now be able to see your knowledge base at `https://<username>.github.io/<repository>/log4brains/`.
-It will be re-built and published every time you push on `master`.
+It will be re-built and published every time you push on `main`.
 
 </p>
 </details>
@@ -237,7 +237,7 @@ pages:
 ```
 
 You should now be able to see your knowledge base at `https://<username>.gitlab.io/<repository>/log4brains/`.
-It will be re-built and published every time you push on `master`.
+It will be re-built and published every time you push on `main`.
 
 </p>
 </details>

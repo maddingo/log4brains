@@ -11,7 +11,7 @@ function buildViewUrl(
     return undefined;
   }
   const uri = repositoryConfig.viewFileUriPattern
-    .replace("%branch", "master") // TODO: make this customizable
+    .replace("%branch", "master") // TODO: make this customizable, and fix the branch name for the Log4brains repository (develop instead of master)
     .replace("%path", file.path.pathRelativeToCwd);
   return `${repositoryConfig.url.replace(/\.git$/, "")}${uri}`;
 }
