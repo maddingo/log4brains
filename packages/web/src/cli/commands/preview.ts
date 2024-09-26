@@ -44,6 +44,16 @@ export async function previewCommand(
   // @ts-ignore
   app.server.incrementalCache.incrementalOptions.dev = true; // eslint-disable-line @typescript-eslint/no-unsafe-member-access
 
+  // TODO/WIP: move public/* to static/*, then do the URI replaces everywhere, think about refresh, rsync etc at the end, then refine this implementation which is too laxist
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, func-names
+  app.server.isServeableUrl = function (untrustedFileUrl: string): boolean {
+    // eslint-disable-next-line no-console
+    console.log(untrustedFileUrl);
+    return true;
+  };
+
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const srv = createServer(app.getRequestHandler());
 
@@ -67,7 +77,8 @@ export async function previewCommand(
           srv.listen(port);
         })
     );
-  } catch (err) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
     appConsole.stopSpinner();
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (err.code === "EADDRINUSE") {

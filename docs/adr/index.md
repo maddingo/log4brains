@@ -27,6 +27,8 @@ The typical workflow of an ADR is the following:
 
 ![ADR workflow](/l4b-static/adr-workflow.png)
 
+TODO/WIP: support images from static/?
+
 The decision process is entirely collaborative and backed by pull requests.
 
 ## More information

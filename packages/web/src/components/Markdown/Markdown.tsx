@@ -39,62 +39,89 @@ function Code(props: { children: React.ReactNode }) {
   return <code className={classes.code}>{children}</code>;
 }
 
-const options = {
-  overrides: {
-    h1: {
-      component: Typography,
-      props: { variant: "h3", component: "h1", gutterBottom: true }
-    },
-    h2: {
-      component: MarkdownHeading,
-      props: { variant: "h2" }
-    },
-    h3: {
-      component: MarkdownHeading,
-      props: { variant: "h3" }
-    },
-    h4: {
-      component: MarkdownHeading,
-      props: { variant: "h4" }
-    },
-    p: { component: Typography, props: { paragraph: true } },
-    a: { component: MuiLink },
-    li: { component: Li },
-    AdrLink: { component: AdrLink },
-    code: { component: Code }
-  },
-  slugify
+type ImageProps = {
+  src: string;
+  alt: string;
+  nextBasePath: string;
 };
+
+function Image(props: ImageProps) {
+  const { alt, nextBasePath } = props;
+  let { src } = props;
+
+  // Preprends nextBasePath to l4b-static assets (useful for `index.md`'s adr-workflow.png image, for example)
+  if (src.startsWith("/l4b-static/")) {
+    src = nextBasePath + src;
+  }
+
+  return <img src={src} alt={alt} />;
+}
+
+type LocalImageProps = {
+  pathFromCwd: string;
+  alt: string;
+  nextBasePath: string;
+};
+
+function LocalImage(props: LocalImageProps) {
+  const { pathFromCwd, alt, nextBasePath } = props;
+  const rewritenPath = `${nextBasePath}/static/l4b-local-images/${pathFromCwd.replaceAll(
+    "/",
+    "-"
+  )}`;
+  return <img src={rewritenPath} alt={alt} />;
+}
+
+function isReactElementWithChildren(
+  obj: JSX.Element
+): obj is React.ReactElement<{ children: React.ReactElement }> {
+  return "children" in obj.props; // TODO/WIP: improve tests here
+}
 
 type MarkdownProps = {
   children: string;
   onCompiled?: (content: React.ReactElement) => void;
 };
 
-function isReactElementWithChildren(
-  obj: JSX.Element
-): obj is React.ReactElement<{ children: React.ReactElement }> {
-  return "children" in obj.props; // TODO: improve tests here
-}
-
 export function Markdown({ children, onCompiled }: MarkdownProps) {
   const rootRef = React.useRef<HTMLDivElement>(null);
 
   const router = useRouter();
 
-  const renderedMarkdown = useMemo(
-    () =>
-      mdCompiler(
-        children.replace(
-          // Fix for `index.md`'s adr-workflow.png image path
-          // TODO: support local images (https://github.com/thomvaill/log4brains/issues/4)
-          /\((\/l4b-static\/[^)]+)\)/g,
-          `(${router?.basePath}$1)`
-        ),
-        options
-      ),
-    [children, router]
-  );
+  const renderedMarkdown = useMemo(() => {
+    const options = {
+      overrides: {
+        h1: {
+          component: Typography,
+          props: { variant: "h3", component: "h1", gutterBottom: true }
+        },
+        h2: {
+          component: MarkdownHeading,
+          props: { variant: "h2" }
+        },
+        h3: {
+          component: MarkdownHeading,
+          props: { variant: "h3" }
+        },
+        h4: {
+          component: MarkdownHeading,
+          props: { variant: "h4" }
+        },
+        p: { component: Typography, props: { paragraph: true } },
+        a: { component: MuiLink },
+        li: { component: Li },
+        AdrLink: { component: AdrLink },
+        code: { component: Code },
+        img: { component: Image, props: { nextBasePath: router.basePath } },
+        LocalImage: {
+          component: LocalImage,
+          props: { nextBasePath: router.basePath }
+        }
+      },
+      slugify
+    };
+    return mdCompiler(children, options);
+  }, [children, router.basePath]);
 
   useEffect(() => {
     if (onCompiled && isReactElementWithChildren(renderedMarkdown)) {
