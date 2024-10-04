@@ -133,3 +133,10 @@ If you're interested in becoming a co-maintainer, you can start your "Mentorship
 
 Once we identify a trusted contributor, we will elevate them to the **Canary Maintainer** status, with permissions to merge PRs and perform other tasks.
 Later, a **Canary Maintainer** can become a **Core Maintainer** if they demonstrate a strong understanding of the project and its direction and if they are motived to take on the additional responsibilities.
+
+## Issues triage
+
+_Work in Progress_
+
+- **Core Maintainers** are responsible for managing the [milestones](https://github.com/thomvaill/log4brains/milestones) of the project: this enables contributor to see what is planned for the next release, and what is the priority of the issues
+- **Canary Maintainers** are responsible for triaging issues and PRs
