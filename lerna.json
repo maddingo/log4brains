@@ -1,5 +1,5 @@
 {
-  "version": "1.0.1",
+  "version": "1.1.0",
   "npmClient": "yarn",
   "useWorkspaces": true,
   "packages": [
@@ -8,7 +8,7 @@
   "command": {
     "version": {
       "message": "chore(release): publish %s",
-      "allowBranch": "master"
+      "allowBranch": "develop"
     }
   }
 }

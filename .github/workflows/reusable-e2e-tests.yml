@@ -1,0 +1,45 @@
+on:
+  workflow_call:
+    inputs:
+      npm-package-fullname:
+        required: true
+        type: string
+      experimental:
+        required: false
+        type: boolean
+        default: false
+      os:
+        required: true
+        type: string
+      # Set only one of these two inputs:
+      node-version:
+        required: false
+        type: string
+      node-version-file:
+        required: false
+        type: string
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  e2e-tests:
+    runs-on: ${{ inputs.os }}
+    continue-on-error: ${{ inputs.experimental }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # required by Log4brains to work correctly (needs the whole Git history)
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ inputs.node-version-file }}
+          node-version: ${{ inputs.node-version }}
+          cache: yarn
+          cache-dependency-path: yarn.lock
+
+      # But we do install log4brains from the registry
+      - run: npm install -g ${{ inputs.npm-package-fullname }}
+
+      - name: E2E Tests on the registry version
+        run: yarn e2e

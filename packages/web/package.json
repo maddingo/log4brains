@@ -1,6 +1,6 @@
 {
   "name": "@log4brains/web",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Log4brains architecture knowledge base web UI and static site generator",
   "keywords": [
     "log4brains"
@@ -18,38 +18,44 @@
     "directory": "packages/web"
   },
   "engines": {
-    "node": ">=10.23.0"
+    "node": ">=18"
   },
   "files": [
-    "dist"
+    "dist",
+    "nextjs"
   ],
-  "source": "./src/index.ts",
+  "source": "./index.ts",
   "main": "./dist/index.js",
+  "module": "./dist/index.module.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "yarn build && nodemon",
-    "dev-old": "cross-env NODE_ENV=development LOG4BRAINS_CWD=../.. ESM_DISABLE_CACHE=true node -r esm -r ts-node/register ./src/bin/main.ts",
-    "next": "cross-env LOG4BRAINS_CWD=../.. next",
-    "build:ts": "tsc --noEmit false --declaration true && del-cli \"dist/pages/**/*.d.ts\"",
-    "build": "yarn clean && yarn build:ts && copyfiles --all next.config.js .babelrc \"public/**/*\" dist && copyfiles --all --up 1 \"src/lib/core-api/noop/**/*\" src/components/Markdown/hljs.css dist && cross-env LOG4BRAINS_PHASE=initial-build next build dist",
-    "clean": "rimraf ./dist",
+    "dev": "yarn dev:cli",
+    "build": "yarn build:cli && yarn build:nextjs",
+    "clean": "yarn clean:cli && yarn clean:nextjs",
+    "dev:cli": "microbundle --no-compress --format es,cjs --tsconfig tsconfig.build.json --target node watch",
+    "build:cli": "microbundle --no-compress --format es,cjs --tsconfig tsconfig.build.json --target node",
+    "clean:cli": "rimraf ./dist",
+    "dev:nextjs": "cd nextjs && cross-env LOG4BRAINS_CWD=../.. NODE_OPTIONS=--openssl-legacy-provider next",
+    "build:nextjs": "yarn clean:nextjs && cd nextjs && cross-env LOG4BRAINS_PHASE=initial-build NODE_OPTIONS=--openssl-legacy-provider next build",
+    "clean:nextjs": "rimraf ./nextjs/.next ./nextjs/.next-export",
     "serve": "serve .log4brains/out",
-    "typescript": "tsc",
+    "typescript": "tsc --noEmit && cd nextjs && tsc",
     "test": "jest",
     "lint": "eslint . --max-warnings=0",
-    "storybook": "start-storybook -p 6006",
+    "storybook": "cd nextjs && cross-env NODE_OPTIONS=--openssl-legacy-provider start-storybook -p 6006",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@log4brains/cli-common": "1.0.0",
-    "@log4brains/core": "1.0.0",
+    "@log4brains/cli-common": "1.1.0",
+    "@log4brains/core": "1.1.0",
     "@material-ui/core": "^4.11.0",
     "@material-ui/icons": "^4.9.1",
     "@material-ui/lab": "^4.0.0-alpha.56",
     "@next/bundle-analyzer": "^10.0.1",
+    "@types/node": "^15.0.1",
+    "@types/react": "17.0.4",
     "babel-plugin-import": "^1.13.1",
     "badge-maker": "^3.3.0",
-    "bufferutil": "^4.0.2",
     "chalk": "^4.1.0",
     "clsx": "^1.1.1",
     "commander": "^6.1.0",
@@ -67,7 +73,7 @@
     "slugify": "^1.4.5",
     "socket.io": "^2.3.0",
     "socket.io-client": "^2.3.1",
-    "utf-8-validate": "^5.0.3"
+    "typescript": "^4.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
@@ -77,7 +83,6 @@
     "@storybook/react": "^6.1.9",
     "@types/lunr": "^2.3.3",
     "@types/mkdirp": "^1.0.1",
-    "@types/react": "^17.0.0",
     "@types/react-test-renderer": "^16.9.3",
     "@types/signale": "^1.4.1",
     "@types/socket.io": "^2.1.11",
@@ -87,8 +92,8 @@
     "babel-loader": "^8.1.0",
     "copyfiles": "^2.4.0",
     "del-cli": "^3.0.1",
+    "microbundle": "^0.12.4",
     "react-is": "^16.13.1",
-    "react-test-renderer": "^17.0.1",
-    "ts-node": "^9.0.0"
+    "react-test-renderer": "^17.0.1"
   }
 }

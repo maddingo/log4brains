@@ -2,16 +2,16 @@
 
 <p align="center">
   <a href="#readme">
-    <img src="https://github.com/thomvaill/log4brains/raw/master/docs/Log4brains-logo-full.png" alt="Log4brains logo" width="276" />
+    <img src="https://github.com/thomvaill/log4brains/raw/develop/docs/Log4brains-logo-full.png" alt="Log4brains logo" width="276" />
   </a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/thomvaill/log4brains/blob/master/LICENSE">
+  <a href="https://github.com/thomvaill/log4brains/blob/develop/LICENSE">
     <img src="https://img.shields.io/badge/license-Apache%202-blue" alt="License" />
   </a>
-  <a href="https://github.com/thomvaill/log4brains/actions?query=workflow%3ABuild">
-    <img src="https://github.com/thomvaill/log4brains/workflows/Build/badge.svg" alt="Build Status" />
+  <a href="https://github.com/thomvaill/log4brains/actions/workflows/on-merge-to-develop.yml">
+    <img src="https://github.com/thomvaill/log4brains/actions/workflows/on-merge-to-develop.yml/badge.svg" alt="Build Status" />
   </a>
   <a href="https://github.com/thomvaill/log4brains/releases">
     <img src="https://img.shields.io/npm/v/log4brains?label=log4brains" alt="log4brains latest version" />
@@ -64,7 +64,7 @@ By logging your decisions chronologically, you will be able to:
 <br />
 <p align="center">
   <a href="https://www.youtube.com/watch?v=HDEwOCn9T0w" title="Click to watch the full screencast">
-    <img src="https://github.com/thomvaill/log4brains/raw/master/docs/demo.gif" alt="Log4brains demo" width="838" />
+    <img src="https://github.com/thomvaill/log4brains/raw/develop/docs/demo.gif" alt="Log4brains demo" width="838" />
   </a>
 </p>
 <p align="center"><a href="https://www.youtube.com/watch?v=HDEwOCn9T0w">🎞️ Watch the full screencast</a> - <a href="https://thomvaill.github.io/log4brains/adr/">⚡ See an example (Log4brains' own ADRs)</a></p>
@@ -93,7 +93,7 @@ in the same git repository, to keep them in sync.
 To get started, run these commands inside your project root folder:
 
 ```bash
-npm install -g log4brains
+npm install -g log4brains # if you want to install the latest beta version, run `npm install -g log4brains@beta` instead
 log4brains init
 ```
 
@@ -163,20 +163,18 @@ name: Publish Log4brains
 on:
   push:
     branches:
-      - master
+      - main
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v4
         with:
           persist-credentials: false # required by JamesIves/github-pages-deploy-action
           fetch-depth: 0 # required by Log4brains to work correctly (needs the whole Git history)
-      - name: Install Node
-        uses: actions/setup-node@v1
+      - uses: actions/setup-node@v4
         with:
-          node-version: "14"
+          node-version: lts/*
       - name: Install and Build Log4brains
         run: |
           npm install -g log4brains
@@ -208,7 +206,7 @@ Finally, you can [enable your GitHub page](https://docs.github.com/en/free-pro-t
 - Then, select the `/ (root)` folder
 
 You should now be able to see your knowledge base at `https://<username>.github.io/<repository>/log4brains/`.
-It will be re-built and published every time you push on `master`.
+It will be re-built and published every time you push on `main`.
 
 </p>
 </details>
@@ -220,7 +218,7 @@ It will be re-built and published every time you push on `master`.
 Create your `.gitlab-ci.yml` and adapt it to your case:
 
 ```yml
-image: node:14-alpine3.12
+image: node:lts-alpine
 pages:
   stage: deploy
   variables:
@@ -237,7 +235,7 @@ pages:
 ```
 
 You should now be able to see your knowledge base at `https://<username>.gitlab.io/<repository>/log4brains/`.
-It will be re-built and published every time you push on `master`.
+It will be re-built and published every time you push on `main`.
 
 </p>
 </details>
@@ -298,7 +296,7 @@ Finally, you can add the ADR badge to your `README.md`!
 
 ### What are the prerequisites?
 
-- Node.js >= 12
+- Node.js: active or maintenance LTS version (see [Node.js release schedule](https://github.com/nodejs/release#release-schedule); versions outside of this range are not guaranteed to work; "current" version is supported in a best effort mode)
 - NPM or Yarn
 - Git
 

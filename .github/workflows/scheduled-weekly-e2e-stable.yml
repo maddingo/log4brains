@@ -1,0 +1,39 @@
+name: Weekly E2E tests (stable only)
+on:
+  workflow_dispatch:
+
+  # Run on every Wednesday to check possible regressions caused by dependency updates
+  # Like this one: https://github.com/thomvaill/log4brains/issues/27
+  schedule:
+    - cron: "0 4 * * 3"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  load-nodejs-supported-versions:
+    uses: ./.github/workflows/reusable-load-nodejs-supported-versions.yml
+
+  e2e:
+    needs: load-nodejs-supported-versions
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: ${{ fromJson(needs.load-nodejs-supported-versions.outputs.node_versions) }}
+    uses: ./.github/workflows/reusable-e2e-tests.yml
+    with:
+      npm-package-fullname: log4brains # stable version
+      os: ${{ matrix.os }}
+      node-version: ${{ matrix.node-version }}
+
+  e2e-tests-nodejs-current:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    uses: ./.github/workflows/reusable-e2e-tests.yml
+    with:
+      npm-package-fullname: log4brains # stable version
+      os: ${{ matrix.os }}
+      node-version: current
+      experimental: true # best effort mode

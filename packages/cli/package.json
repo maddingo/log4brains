@@ -1,6 +1,6 @@
 {
   "name": "@log4brains/cli",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Log4brains architecture knowledge base CLI",
   "keywords": [
     "log4brains"
@@ -18,25 +18,26 @@
     "directory": "packages/cli"
   },
   "engines": {
-    "node": ">=10.23.0"
+    "node": ">=18"
   },
   "files": [
     "dist"
   ],
   "source": "./src/index.ts",
   "main": "./dist/index.js",
+  "module": "./dist/index.module.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "dev": "nodemon",
-    "build": "tsc --build tsconfig.build.json",
+    "dev": "microbundle --no-compress --format es,cjs --tsconfig tsconfig.build.json --target node watch",
+    "build": "microbundle --no-compress --format es,cjs --tsconfig tsconfig.build.json --target node",
     "clean": "rimraf ./dist",
     "typescript": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "@log4brains/cli-common": "1.0.0",
-    "@log4brains/core": "1.0.0",
+    "@log4brains/cli-common": "1.1.0",
+    "@log4brains/core": "1.1.0",
     "commander": "^6.1.0",
     "execa": "^5.0.0",
     "terminal-link": "^2.1.1"

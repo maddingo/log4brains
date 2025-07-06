@@ -3,6 +3,101 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/thomvaill/log4brains/compare/v1.1.0-alpha.4...v1.1.0) (2024-12-17)
+
+**Note:** Version bump only for package log4brains
+
+
+
+
+
+# [1.1.0-alpha.4](https://github.com/thomvaill/log4brains/compare/v1.1.0-alpha.3...v1.1.0-alpha.4) (2024-12-17)
+
+**Note:** Version bump only for package log4brains
+
+
+
+
+
+# [1.1.0-alpha.3](https://github.com/thomvaill/log4brains/compare/v1.1.0-alpha.2...v1.1.0-alpha.3) (2024-12-16)
+
+**Note:** Version bump only for package log4brains
+
+
+
+
+
+# [1.1.0-alpha.2](https://github.com/thomvaill/log4brains/compare/v1.1.0-alpha.1...v1.1.0-alpha.2) (2024-12-16)
+
+**Note:** Version bump only for package log4brains
+
+
+
+
+
+# [1.1.0-alpha.1](https://github.com/thomvaill/log4brains/compare/v1.1.0-alpha.0...v1.1.0-alpha.1) (2024-12-15)
+
+**Note:** Version bump only for package log4brains
+
+
+
+
+
+# [1.1.0-alpha.0](https://github.com/thomvaill/log4brains/compare/v1.0.2-alpha.4...v1.1.0-alpha.0) (2024-12-14)
+
+
+### Bug Fixes
+
+* perform recursive workdir detection in web cli too ([98c1046](https://github.com/thomvaill/log4brains/commit/98c104615966bbc156850daaf2ad9f633ce434de))
+* remove esm dependency from global-cli ([254c82f](https://github.com/thomvaill/log4brains/commit/254c82f058231020b8bfbc8b3d4b446020f3f698))
+
+
+
+
+
+## [1.0.2-alpha.4](https://github.com/thomvaill/log4brains/compare/v1.0.2-alpha.3...v1.0.2-alpha.4) (2024-11-21)
+
+**Note:** Version bump only for package log4brains
+
+
+
+
+
+## [1.0.2-alpha.3](https://github.com/thomvaill/log4brains/compare/v1.0.2-alpha.2...v1.0.2-alpha.3) (2024-10-29)
+
+**Note:** Version bump only for package log4brains
+
+
+
+
+
+## [1.0.2-alpha.2](https://github.com/thomvaill/log4brains/compare/v1.0.2-alpha.1...v1.0.2-alpha.2) (2024-10-29)
+
+**Note:** Version bump only for package log4brains
+
+
+
+
+
+## [1.0.2-alpha.1](https://github.com/thomvaill/log4brains/compare/v1.0.2-alpha.0...v1.0.2-alpha.1) (2024-10-29)
+
+**Note:** Version bump only for package log4brains
+
+
+
+
+
+## [1.0.2-alpha.0](https://github.com/thomvaill/log4brains/compare/v1.0.1...v1.0.2-alpha.0) (2024-10-29)
+
+
+### Bug Fixes
+
+* make Log4brains run on Node 18 and 20 ([58dcfff](https://github.com/thomvaill/log4brains/commit/58dcfffd7ceb706bef6d43838be5d0358ed0f51f))
+
+
+
+
+
 ## [1.0.1](https://github.com/thomvaill/log4brains/compare/v1.0.0...v1.0.1) (2022-09-22)
 
 **Note:** Version bump only for package log4brains

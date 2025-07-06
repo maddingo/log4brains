@@ -17,9 +17,9 @@ npm config set registry https://registry.npmjs.org/
 
 cd "${ROOT_PATH}"
 
-if [[ "$(git rev-parse --abbrev-ref HEAD)" != "master" ]]
+if [[ "$(git rev-parse --abbrev-ref HEAD)" != "develop" ]]
 then
-  echo "Please run this command from the master branch"
+  echo "Please run this command from the develop branch"
   exit 1
 fi
 
@@ -34,9 +34,11 @@ read -rp "Press any key to continue or Ctrl+C to abort..."
 
 yarn lerna publish \
   --conventional-commits \
+  --conventional-graduate \
   --exact \
   --create-release github
 
 echo ""
 echo "Done!"
 echo "Please now monitor the Post-Release actions: https://github.com/thomvaill/log4brains/actions"
+echo "And don't forget to edit CHANGELOG.md and the Github release to write a clean changelog of this release"

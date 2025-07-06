@@ -1,0 +1,104 @@
+name: On release tag push
+on:
+  workflow_dispatch:
+
+  # Run after every release to NPM (alpha and stable)
+  push:
+    tags:
+      - v*
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  get-log4brains-version:
+    uses: ./.github/workflows/reusable-get-log4brains-version.yml
+
+  wait-for-npm-version-to-be-published:
+    needs: get-log4brains-version
+    uses: ./.github/workflows/reusable-wait-for-npm-version-to-be-published.yml
+    with:
+      npm-package: log4brains
+      npm-version: ${{ needs.get-log4brains-version.outputs.version }}
+
+  load-nodejs-supported-versions:
+    uses: ./.github/workflows/reusable-load-nodejs-supported-versions.yml
+
+  e2e-tests:
+    needs:
+      - load-nodejs-supported-versions
+      - get-log4brains-version
+      - wait-for-npm-version-to-be-published
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        node-version: ${{ fromJson(needs.load-nodejs-supported-versions.outputs.node_versions) }}
+    uses: ./.github/workflows/reusable-e2e-tests.yml
+    with:
+      npm-package-fullname: log4brains@${{ needs.get-log4brains-version.outputs.version }}
+      os: ${{ matrix.os }}
+      node-version: ${{ matrix.node-version }}
+
+  e2e-tests-nodejs-current:
+    needs:
+      - get-log4brains-version
+      - wait-for-npm-version-to-be-published
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    uses: ./.github/workflows/reusable-e2e-tests.yml
+    with:
+      npm-package-fullname: log4brains@${{ needs.get-log4brains-version.outputs.version }}
+      os: ${{ matrix.os }}
+      node-version: current
+      experimental: true # best effort mode
+
+  docker-build-and-push:
+    needs: e2e-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push the latest alpha Docker image
+        working-directory: ./docker
+        run: |
+          echo "Log4brains version: "
+          make print-version-tag
+          if make print-version-tag | grep alpha &> /dev/null
+          then
+            echo "Pushing an alpha release..."
+            MDF_BRANCH_TAG=alpha make release version-tag branch-tag
+          else
+            echo "Pushing a stable release..."
+            make release version-tag latest-tag
+          fi
+
+  publish-adr:
+    needs:
+      - get-log4brains-version
+      - e2e-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false # required by JamesIves/github-pages-deploy-action
+          fetch-depth: 0 # required by Log4brains to work correctly (needs the whole Git history)
+      # We don't use cache here so we really test a fresh install
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc # current LTS
+      - name: Install and Build Log4brains
+        run: |
+          npm install -g log4brains@${{ needs.get-log4brains-version.outputs.version }}
+          log4brains build --basePath /${GITHUB_REPOSITORY#*/}/adr
+      - name: Publish to Github pages
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: .log4brains/out
+          TARGET_FOLDER: adr

@@ -1,0 +1,30 @@
+on:
+  workflow_call:
+    inputs:
+      npm-package:
+        required: true
+        type: string
+      npm-version: # only exact versions allowed, not tags like "latest" or "alpha"
+        required: true
+        type: string
+      wait-minutes:
+        required: false
+        type: string
+        default: "10"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  wait-for-npm-version-to-be-published:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/wait-for-npm-version-to-be-published.sh
+          sparse-checkout-cone-mode: false
+      - name: Wait
+        run: ./scripts/wait-for-npm-version-to-be-published.sh "${{ inputs.npm-package }}" "${{ inputs.npm-version }}" "${{ inputs.wait-minutes }}"

@@ -1,0 +1,27 @@
+on:
+  workflow_call:
+    outputs:
+      version:
+        description: "Log4brains current version"
+        value: ${{ jobs.get-log4brains-version.outputs.version }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  get-log4brains-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.get-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            lerna.json
+          sparse-checkout-cone-mode: false
+      - name: Get log4brains version from lerna.json
+        id: get-version
+        run: |
+          version="$(cat lerna.json | jq -r .version)"
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"

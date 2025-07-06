@@ -1,0 +1,33 @@
+# Inspired from https://github.com/backstage/backstage/blob/master/.github/workflows/ci.yml. Thanks!
+name: Pull request checks
+on:
+  workflow_dispatch:
+  pull_request:
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  quality-checks:
+    uses: ./.github/workflows/reusable-quality-checks.yml
+
+  # We only test the LTS on all OSes for performance reasons
+  # Other versions will be tested on the main workflow after the merge
+  tests-LTS-per-os:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    uses: ./.github/workflows/reusable-tests.yml
+    with:
+      only-changed-packages: true # for performance
+      os: ${{ matrix.os }}
+      node-version-file: .nvmrc # current LTS
+
+  tests-nodejs-current:
+    uses: ./.github/workflows/reusable-tests.yml
+    with:
+      only-changed-packages: true # for performance
+      os: ubuntu-latest
+      node-version: current
+      experimental: true # best effort mode

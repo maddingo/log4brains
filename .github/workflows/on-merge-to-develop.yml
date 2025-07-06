@@ -1,0 +1,82 @@
+# Inspired from https://github.com/backstage/backstage/blob/master/.github/workflows/ci.yml. Thanks!
+name: On merge to develop (alpha releases)
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+    paths:
+      - "packages/**"
+      - "!packages/**/CHANGELOG.md" # filters out changes made by lerna
+      - "!packages/**/package.json" # filters out changes made by lerna
+      - ".github/workflows/build.yml"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  quality-checks:
+    uses: ./.github/workflows/reusable-quality-checks.yml
+
+  load-nodejs-supported-versions:
+    uses: ./.github/workflows/reusable-load-nodejs-supported-versions.yml
+
+  # We test the current LTS on all OSes and other supported versions are only tested on Ubuntu for performance reasons
+  # All the other os/version tuples will be tested in the post-release E2E workflow
+  tests-per-nodejs-version:
+    needs: load-nodejs-supported-versions
+    strategy:
+      matrix:
+        node-version: ${{ fromJson(needs.load-nodejs-supported-versions.outputs.node_versions) }}
+    uses: ./.github/workflows/reusable-tests.yml
+    with:
+      os: ubuntu-latest
+      node-version: ${{ matrix.node-version }}
+
+  tests-LTS-per-other-os:
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
+    uses: ./.github/workflows/reusable-tests.yml
+    with:
+      os: ${{ matrix.os }}
+      node-version-file: .nvmrc # current LTS
+
+  tests-nodejs-current:
+    uses: ./.github/workflows/reusable-tests.yml
+    with:
+      os: ubuntu-latest
+      node-version: current
+      experimental: true # best effort mode
+
+  release-alpha:
+    needs:
+      - quality-checks
+      - tests-per-nodejs-version
+      - tests-LTS-per-other-os
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # fetch all history for Lerna (https://stackoverflow.com/a/60184319/9285308)
+          ssh-key: ${{ secrets.LERNA_GITHUB_DEPLOY_KEY }} # so that Lerna is able to push to the protected branch (https://github.com/orgs/community/discussions/25305#discussioncomment-10728028)
+      - name: Fetch all git tags for Lerna # (https://stackoverflow.com/a/60184319/9285308)
+        run: git fetch --depth=1 origin +refs/tags/*:refs/tags/* || true
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc # current LTS
+          cache: yarn
+          cache-dependency-path: yarn.lock
+          registry-url: https://registry.npmjs.org/ # needed by lerna to push to NPM
+      - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - name: Git identity for github-actions[bot]
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      - name: Run lerna publish
+        run: yarn lerna publish --yes --conventional-commits --conventional-prerelease --force-publish --dist-tag alpha --exact --create-release github
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

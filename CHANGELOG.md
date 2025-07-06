@@ -3,6 +3,130 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.1.0](https://github.com/thomvaill/log4brains/compare/v1.1.0-alpha.4...v1.1.0) (2024-12-17)
+
+### Bug Fixes
+
+* make Log4brains run on Node 18 and 20 ([58dcfff](https://github.com/thomvaill/log4brains/commit/58dcfffd7ceb706bef6d43838be5d0358ed0f51f))
+* workaround for ERR_OSSL_EVP_UNSUPPORTED build issue ([#114](https://github.com/thomvaill/log4brains/issues/114)) ([8e93409](https://github.com/thomvaill/log4brains/commit/8e93409d95777d3036ad809982aa70a9f26d8dd6))
+* perform recursive workdir detection in web cli too ([98c1046](https://github.com/thomvaill/log4brains/commit/98c104615966bbc156850daaf2ad9f633ce434de))
+* remove esm dependency from global-cli ([254c82f](https://github.com/thomvaill/log4brains/commit/254c82f058231020b8bfbc8b3d4b446020f3f698))
+
+### Features
+
+* alpha releases ([3a083c4](https://github.com/thomvaill/log4brains/commit/3a083c45f0bf54647c2b03c206ac38adf11022f2))
+* support Node.js 22 ([f7781b6](https://github.com/thomvaill/log4brains/commit/f7781b6b78e526d793183f6253ec4282245e10cd))
+
+
+# [1.1.0-alpha.4](https://github.com/thomvaill/log4brains/compare/v1.1.0-alpha.3...v1.1.0-alpha.4) (2024-12-17)
+
+**Note:** Version bump only for package root
+
+
+
+
+
+# [1.1.0-alpha.3](https://github.com/thomvaill/log4brains/compare/v1.1.0-alpha.2...v1.1.0-alpha.3) (2024-12-16)
+
+
+### Bug Fixes
+
+* @types/react version ([3bdedea](https://github.com/thomvaill/log4brains/commit/3bdedeab3bf34db551bf95b6168d98bfb0de3ed2))
+
+
+
+
+
+# [1.1.0-alpha.2](https://github.com/thomvaill/log4brains/compare/v1.1.0-alpha.1...v1.1.0-alpha.2) (2024-12-16)
+
+
+### Bug Fixes
+
+* ts types for nextjs 2nd try ([056a1a4](https://github.com/thomvaill/log4brains/commit/056a1a40c1088eecd5559151253525c823b6271b))
+
+
+
+
+
+# [1.1.0-alpha.1](https://github.com/thomvaill/log4brains/compare/v1.1.0-alpha.0...v1.1.0-alpha.1) (2024-12-15)
+
+
+### Bug Fixes
+
+* @types/node version ([d3ae0dc](https://github.com/thomvaill/log4brains/commit/d3ae0dcdfcfd934826dae927b07a573972fbaa49))
+* ts types for nextjs ([78c466e](https://github.com/thomvaill/log4brains/commit/78c466ee4a01bcddca09dbfa1ad391b4e9e5d03f))
+
+
+
+
+
+# [1.1.0-alpha.0](https://github.com/thomvaill/log4brains/compare/v1.0.2-alpha.4...v1.1.0-alpha.0) (2024-12-14)
+
+
+### Bug Fixes
+
+* perform recursive workdir detection in web cli too ([98c1046](https://github.com/thomvaill/log4brains/commit/98c104615966bbc156850daaf2ad9f633ce434de))
+* remove esm dependency from global-cli ([254c82f](https://github.com/thomvaill/log4brains/commit/254c82f058231020b8bfbc8b3d4b446020f3f698))
+
+
+### Features
+
+* support Node.js 22 ([f7781b6](https://github.com/thomvaill/log4brains/commit/f7781b6b78e526d793183f6253ec4282245e10cd))
+
+
+
+
+
+## [1.0.2-alpha.4](https://github.com/thomvaill/log4brains/compare/v1.0.2-alpha.3...v1.0.2-alpha.4) (2024-11-21)
+
+**Note:** Version bump only for package root
+
+
+
+
+
+## [1.0.2-alpha.3](https://github.com/thomvaill/log4brains/compare/v1.0.2-alpha.2...v1.0.2-alpha.3) (2024-10-29)
+
+**Note:** Version bump only for package root
+
+
+
+
+
+## [1.0.2-alpha.2](https://github.com/thomvaill/log4brains/compare/v1.0.2-alpha.1...v1.0.2-alpha.2) (2024-10-29)
+
+
+### Bug Fixes
+
+* alpha releases ([3a083c4](https://github.com/thomvaill/log4brains/commit/3a083c45f0bf54647c2b03c206ac38adf11022f2))
+
+
+
+
+
+## [1.0.2-alpha.1](https://github.com/thomvaill/log4brains/compare/v1.0.2-alpha.0...v1.0.2-alpha.1) (2024-10-29)
+
+
+### Bug Fixes
+
+* lerna publish on Node 18-20 ([0e78d47](https://github.com/thomvaill/log4brains/commit/0e78d473fed1b98be395e072f1193436858869f9))
+
+
+
+
+
+## [1.0.2-alpha.0](https://github.com/thomvaill/log4brains/compare/v1.0.1...v1.0.2-alpha.0) (2024-10-29)
+
+
+### Bug Fixes
+
+* make Log4brains run on Node 18 and 20 ([58dcfff](https://github.com/thomvaill/log4brains/commit/58dcfffd7ceb706bef6d43838be5d0358ed0f51f))
+* workaround for ERR_OSSL_EVP_UNSUPPORTED build issue ([#114](https://github.com/thomvaill/log4brains/issues/114)) ([8e93409](https://github.com/thomvaill/log4brains/commit/8e93409d95777d3036ad809982aa70a9f26d8dd6))
+
+
+
+
+
 ## [1.0.1](https://github.com/thomvaill/log4brains/compare/v1.0.0...v1.0.1) (2022-09-22)
 
 

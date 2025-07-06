@@ -1,6 +1,6 @@
 {
   "name": "log4brains",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Log and publish your architecture decisions (ADR) with Log4brains",
   "keywords": [
     "log4brains",
@@ -28,17 +28,21 @@
     "directory": "packages/global-cli"
   },
   "engines": {
-    "node": ">=10.23.0"
+    "node": ">=18"
   },
   "files": [
     "dist"
   ],
+  "source": "./src/index.ts",
+  "main": "./dist/index.js",
+  "module": "./dist/index.module.js",
+  "types": "./dist/index.d.ts",
   "bin": {
     "log4brains": "./dist/log4brains"
   },
   "scripts": {
-    "dev": "nodemon",
-    "build": "tsc --build tsconfig.build.json && copyfiles -u 1 src/log4brains dist",
+    "dev": "microbundle --no-compress --format es,cjs --tsconfig tsconfig.build.json --target node watch",
+    "build": "microbundle --no-compress --format es,cjs --tsconfig tsconfig.build.json --target node && copyfiles -u 1 src/log4brains dist",
     "clean": "rimraf ./dist",
     "typescript": "tsc --noEmit",
     "lint": "eslint . --max-warnings=0",
@@ -47,13 +51,13 @@
     "unlink": "yarn unlink"
   },
   "dependencies": {
-    "@log4brains/cli": "1.0.0",
-    "@log4brains/cli-common": "1.0.0",
-    "@log4brains/init": "1.0.0",
-    "@log4brains/web": "1.0.1",
+    "@log4brains/cli": "1.1.0",
+    "@log4brains/cli-common": "1.1.0",
+    "@log4brains/core": "1.1.0",
+    "@log4brains/init": "1.1.0",
+    "@log4brains/web": "1.1.0",
     "chalk": "^4.1.0",
-    "commander": "^6.1.0",
-    "esm": "^3.2.25"
+    "commander": "^6.1.0"
   },
   "devDependencies": {
     "copyfiles": "^2.4.0"
