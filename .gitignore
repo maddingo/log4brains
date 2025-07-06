@@ -105,3 +105,7 @@ dist
 
 # Log4brains
 .log4brains
+
+# IntelliJ
+*.iml
+.idea
