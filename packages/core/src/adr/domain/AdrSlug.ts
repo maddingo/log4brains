@@ -1,14 +1,15 @@
-import moment from "moment";
-import slugify from "slugify";
 import { Log4brainsError, ValueObject } from "@src/domain";
 import { AdrFile } from "./AdrFile";
 import { PackageRef } from "./PackageRef";
+import { AdrNamingStrategy, DatePrefixNamingStrategy } from "./naming";
 
 type Props = {
   value: string;
 };
 
 export class AdrSlug extends ValueObject<Props> {
+  private static namingStrategy: AdrNamingStrategy = new DatePrefixNamingStrategy();
+
   constructor(value: string) {
     super({ value });
 
@@ -18,6 +19,21 @@ export class AdrSlug extends ValueObject<Props> {
         value
       );
     }
+  }
+
+  /**
+   * Sets the global naming strategy to use for ADR slug generation.
+   * @param strategy The naming strategy to use
+   */
+  static setNamingStrategy(strategy: AdrNamingStrategy): void {
+    AdrSlug.namingStrategy = strategy;
+  }
+
+  /**
+   * Gets the current naming strategy.
+   */
+  static getNamingStrategy(): AdrNamingStrategy {
+    return AdrSlug.namingStrategy;
   }
 
   get value(): string {
@@ -46,13 +62,7 @@ export class AdrSlug extends ValueObject<Props> {
     packageRef?: PackageRef,
     date?: Date
   ): AdrSlug {
-    const slugifiedTitle = slugify(title, {
-      lower: true,
-      strict: true
-    }).replace(/-*$/, "");
-    const localSlug = `${moment(date).format("YYYYMMDD")}-${slugifiedTitle}`;
-    return new AdrSlug(
-      packageRef ? `${packageRef.name}/${localSlug}` : localSlug
-    );
+    const slug = AdrSlug.namingStrategy.generateSlug(title, packageRef, date);
+    return new AdrSlug(slug);
   }
 }

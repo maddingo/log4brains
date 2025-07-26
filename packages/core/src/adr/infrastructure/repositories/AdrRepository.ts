@@ -264,6 +264,42 @@ export class AdrRepository implements IAdrRepository {
     return slug;
   }
 
+  /**
+   * Gets the next available number for NumberPrefixNamingStrategy.
+   * Examines existing ADR files to find the highest number and returns next.
+   */
+  getNextAdrNumber(packageRef?: PackageRef): number {
+    const adrFolderPath = this.getAdrFolderPath(packageRef);
+
+    if (!fs.existsSync(adrFolderPath.absolutePath)) {
+      return 1;
+    }
+
+    const files = fs
+      .readdirSync(adrFolderPath.absolutePath)
+      .filter((filename) => filename.endsWith(".md"))
+      .filter(
+        (filename) =>
+          !["template.md", "readme.md", "index.md", "backlog.md"].includes(
+            filename.toLowerCase()
+          )
+      );
+
+    let maxNumber = 0;
+    files.forEach((filename) => {
+      // Extract number from filename that starts with digits
+      const match = /^(\d+)-/.exec(filename);
+      if (match) {
+        const number = parseInt(match[1], 10);
+        if (number > maxNumber) {
+          maxNumber = number;
+        }
+      }
+    });
+
+    return maxNumber + 1;
+  }
+
   private getPackageRef(slug: AdrSlug): PackageRef | undefined {
     // undefined if global
     return slug.packagePart ? new PackageRef(slug.packagePart) : undefined;

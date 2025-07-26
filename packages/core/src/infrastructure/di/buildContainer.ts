@@ -10,6 +10,8 @@ import { Log4brainsConfig } from "@src/infrastructure/config";
 import * as adrCommandHandlers from "@src/adr/application/command-handlers";
 import * as adrQueryHandlers from "@src/adr/application/query-handlers";
 import { CommandHandler, QueryHandler } from "@src/application";
+import { AdrSlug, PackageRef } from "@src/adr/domain";
+import { AdrNamingStrategyFactory } from "@src/adr/domain/naming";
 import * as repositories from "@src/adr/infrastructure/repositories";
 import { CommandBus, QueryBus } from "../buses";
 import { FileWatcher } from "../file-watcher";
@@ -31,6 +33,32 @@ export function buildContainer(
     config: asValue(config),
     workdir: asValue(workdir),
     fileWatcher: asClass(FileWatcher).singleton()
+  });
+
+  // Initialize naming strategy based on configuration
+  const initializeNamingStrategy = () => {
+    const namingConfig = config.project.naming || {
+      strategy: "date-prefix",
+      options: {}
+    };
+
+    const getNextNumber = (packageRef?: PackageRef): number => {
+      const adrRepository = container.resolve<repositories.AdrRepository>(
+        "adrRepository"
+      );
+      return adrRepository.getNextAdrNumber(packageRef);
+    };
+
+    const strategy = AdrNamingStrategyFactory.create(namingConfig.strategy, {
+      getNextNumber
+    });
+
+    AdrSlug.setNamingStrategy(strategy);
+  };
+
+  // We need to defer this until after repositories are registered
+  container.register({
+    initializeNamingStrategy: asFunction(initializeNamingStrategy).singleton()
   });
 
   // Repositories
@@ -84,6 +112,9 @@ export function buildContainer(
       return bus;
     }).singleton()
   });
+
+  // Initialize the naming strategy after all dependencies are registered
+  container.resolve("initializeNamingStrategy");
 
   return container;
 }

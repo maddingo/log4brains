@@ -11,3 +11,4 @@ export * from "./MarkdownAdrLinkResolver";
 export * from "./MarkdownBody";
 export * from "./Package";
 export * from "./PackageRef";
+export * from "./naming";
