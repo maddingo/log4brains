@@ -11,7 +11,7 @@ export function getLog4brainsInstance(): Log4brains {
       instance = Log4brains.create(
         path.join(
           getConfig().serverRuntimeConfig.PROJECT_ROOT,
-          "lib/core-api/noop"
+          "src/lib/core-api/noop"
         )
       );
     } else {
