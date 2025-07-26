@@ -4,20 +4,46 @@ import { PackageRef } from "../PackageRef";
 
 /**
  * A naming strategy that uses project ID and incremental numbers.
+ * Each project ID maintains its own number sequence starting from 1.
  * Format: PROJECT_ID-number-slugified-title
  * Example: FRONTEND-1-use-microservices-architecture
  */
 export class ProjectIdNumberNamingStrategy implements AdrNamingStrategy {
-  private getNextNumber: (packageRef?: PackageRef) => number;
+  private getExistingFiles: (packageRef?: PackageRef) => string[];
 
   private getProjectId: (packageRef?: PackageRef) => string;
 
   constructor(dependencies: {
-    getNextNumber: (packageRef?: PackageRef) => number;
+    getExistingFiles: (packageRef?: PackageRef) => string[];
     getProjectId: (packageRef?: PackageRef) => string;
   }) {
-    this.getNextNumber = dependencies.getNextNumber;
+    this.getExistingFiles = dependencies.getExistingFiles;
     this.getProjectId = dependencies.getProjectId;
+  }
+
+  private getNextNumberForProjectId(
+    projectId: string,
+    packageRef?: PackageRef
+  ): number {
+    const files = this.getExistingFiles(packageRef);
+    let maxNumber = 0;
+
+    files.forEach((filename) => {
+      // Extract project ID and number from filename: PROJECT_ID-number-title.md
+      // Remove .md extension first
+      const baseFilename = filename.replace(/\.md$/, "");
+      const match = /^([A-Z_]+)-(\d+)-/.exec(baseFilename);
+      if (match) {
+        const fileProjectId = match[1];
+        const number = parseInt(match[2], 10);
+        // Only consider files with the same project ID
+        if (fileProjectId === projectId && number > maxNumber) {
+          maxNumber = number;
+        }
+      }
+    });
+
+    return maxNumber + 1;
   }
 
   generateSlug(title: string, packageRef?: PackageRef): string {
@@ -27,7 +53,7 @@ export class ProjectIdNumberNamingStrategy implements AdrNamingStrategy {
     }).replace(/-*$/, "");
 
     const projectId = this.getProjectId(packageRef).toUpperCase();
-    const number = this.getNextNumber(packageRef);
+    const number = this.getNextNumberForProjectId(projectId, packageRef);
     const localSlug = `${projectId}-${number}-${slugifiedTitle}`;
 
     return packageRef ? `${packageRef.name}/${localSlug}` : localSlug;

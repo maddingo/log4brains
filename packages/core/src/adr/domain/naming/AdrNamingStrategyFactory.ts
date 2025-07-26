@@ -13,6 +13,11 @@ export interface AdrNamingStrategyFactoryDependencies {
    */
   getNextNumber?: (packageRef?: PackageRef) => number;
   /**
+   * Function to get existing ADR filenames for project-id-number strategy.
+   * Should return an array of filenames for the given package.
+   */
+  getExistingFiles?: (packageRef?: PackageRef) => string[];
+  /**
    * Function to get the project ID for project-id-number strategy.
    * Should return the project identifier for the given package.
    */
@@ -46,13 +51,13 @@ export class AdrNamingStrategyFactory {
         return new SimpleTitleNamingStrategy();
 
       case "project-id-number":
-        if (!dependencies?.getNextNumber || !dependencies?.getProjectId) {
+        if (!dependencies?.getExistingFiles || !dependencies?.getProjectId) {
           throw new Log4brainsError(
-            "ProjectIdNumberNamingStrategy requires getNextNumber and getProjectId dependencies"
+            "ProjectIdNumberNamingStrategy requires getExistingFiles and getProjectId dependencies"
           );
         }
         return new ProjectIdNumberNamingStrategy({
-          getNextNumber: dependencies.getNextNumber,
+          getExistingFiles: dependencies.getExistingFiles,
           getProjectId: dependencies.getProjectId
         });
 

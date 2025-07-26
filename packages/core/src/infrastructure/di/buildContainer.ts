@@ -49,6 +49,13 @@ export function buildContainer(
       return adrRepository.getNextAdrNumber(packageRef);
     };
 
+    const getExistingFiles = (packageRef?: PackageRef): string[] => {
+      const adrRepository = container.resolve<repositories.AdrRepository>(
+        "adrRepository"
+      );
+      return adrRepository.getExistingAdrFiles(packageRef);
+    };
+
     const getProjectId = (packageRef?: PackageRef): string => {
       const adrRepository = container.resolve<repositories.AdrRepository>(
         "adrRepository"
@@ -58,6 +65,7 @@ export function buildContainer(
 
     const strategy = AdrNamingStrategyFactory.create(namingConfig.strategy, {
       getNextNumber,
+      getExistingFiles,
       getProjectId
     });
 

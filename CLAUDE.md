@@ -29,7 +29,7 @@ yarn lint
 yarn typescript
 
 # Format code
-yarn format:fix
+yarn format --write
 
 # Clean build artifacts
 yarn clean

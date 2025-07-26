@@ -80,53 +80,60 @@ describe("AdrNamingStrategy", () => {
   });
 
   describe("ProjectIdNumberNamingStrategy", () => {
-    const mockGetNextNumber = jest.fn();
+    const mockGetExistingFiles = jest.fn();
     const mockGetProjectId = jest.fn();
     const strategy = new ProjectIdNumberNamingStrategy({
-      getNextNumber: mockGetNextNumber,
+      getExistingFiles: mockGetExistingFiles,
       getProjectId: mockGetProjectId
     });
 
     beforeEach(() => {
-      mockGetNextNumber.mockClear();
+      mockGetExistingFiles.mockClear();
       mockGetProjectId.mockClear();
     });
 
-    it("should generate slug with uppercase project ID and number", () => {
+    it("should generate slug with uppercase project ID and number starting from 1", () => {
       mockGetProjectId.mockReturnValue("ADR");
-      mockGetNextNumber.mockReturnValue(1);
+      mockGetExistingFiles.mockReturnValue([]);
       const slug = strategy.generateSlug("Use Microservices Architecture");
 
       expect(slug).toBe("ADR-1-use-microservices-architecture");
       expect(mockGetProjectId).toHaveBeenCalledWith(undefined);
-      expect(mockGetNextNumber).toHaveBeenCalledWith(undefined);
+      expect(mockGetExistingFiles).toHaveBeenCalledWith(undefined);
     });
 
-    it("should convert project ID to uppercase", () => {
+    it("should convert project ID to uppercase and increment numbers per project", () => {
       mockGetProjectId.mockReturnValue("frontend");
-      mockGetNextNumber.mockReturnValue(42);
+      mockGetExistingFiles.mockReturnValue([
+        "FRONTEND-1-existing-adr.md",
+        "BACKEND-1-different-project.md",
+        "FRONTEND-2-another-frontend-adr.md"
+      ]);
       const slug = strategy.generateSlug("Add User Authentication");
 
-      expect(slug).toBe("FRONTEND-42-add-user-authentication");
+      expect(slug).toBe("FRONTEND-3-add-user-authentication");
     });
 
     it("should include package reference when provided", () => {
       mockGetProjectId.mockReturnValue("backend");
-      mockGetNextNumber.mockReturnValue(5);
+      mockGetExistingFiles.mockReturnValue(["BACKEND-1-existing.md"]);
       const packageRef = new PackageRef("api");
       const slug = strategy.generateSlug("Implement GraphQL API", packageRef);
 
-      expect(slug).toBe("api/BACKEND-5-implement-graphql-api");
+      expect(slug).toBe("api/BACKEND-2-implement-graphql-api");
       expect(mockGetProjectId).toHaveBeenCalledWith(packageRef);
-      expect(mockGetNextNumber).toHaveBeenCalledWith(packageRef);
+      expect(mockGetExistingFiles).toHaveBeenCalledWith(packageRef);
     });
 
-    it("should use ADR as default project ID", () => {
-      mockGetProjectId.mockReturnValue("ADR");
-      mockGetNextNumber.mockReturnValue(5);
+    it("should start numbering from 1 for new project IDs", () => {
+      mockGetProjectId.mockReturnValue("NEWPROJECT");
+      mockGetExistingFiles.mockReturnValue([
+        "FRONTEND-1-existing.md",
+        "BACKEND-5-another.md"
+      ]);
       const slug = strategy.generateSlug("Add Authentication System");
 
-      expect(slug).toBe("ADR-5-add-authentication-system");
+      expect(slug).toBe("NEWPROJECT-1-add-authentication-system");
     });
 
     it("should provide correct strategy info", () => {
@@ -193,10 +200,10 @@ describe("AdrNamingStrategy", () => {
     });
 
     it("should create ProjectIdNumberNamingStrategy with dependencies", () => {
-      const getNextNumber = jest.fn().mockReturnValue(1);
+      const getExistingFiles = jest.fn().mockReturnValue([]);
       const getProjectId = jest.fn().mockReturnValue("test");
       const strategy = AdrNamingStrategyFactory.create("project-id-number", {
-        getNextNumber,
+        getExistingFiles,
         getProjectId
       });
 
@@ -207,7 +214,7 @@ describe("AdrNamingStrategy", () => {
       expect(() => {
         AdrNamingStrategyFactory.create("project-id-number");
       }).toThrow(
-        "ProjectIdNumberNamingStrategy requires getNextNumber and getProjectId dependencies"
+        "ProjectIdNumberNamingStrategy requires getExistingFiles and getProjectId dependencies"
       );
     });
 

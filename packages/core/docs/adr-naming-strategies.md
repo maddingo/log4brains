@@ -25,6 +25,13 @@ Log4brains supports different naming strategies for Architecture Decision Record
 - **Example**: `use-microservices-architecture.md`
 - **Use case**: When you want clean, simple filenames without prefixes
 
+### Project Id Number Strategy
+
+- **Strategy ID**: `project-id-number`
+- **Format**: `ID-N-title`
+- **Example**: `PRJ-1-use-microservice-architecture.md`
+- **Use case**: When you want to use easy to remember ADR ids with a short project ID and a short number
+
 ## Configuration
 
 Configure the naming strategy in your `.log4brains.yml` file:

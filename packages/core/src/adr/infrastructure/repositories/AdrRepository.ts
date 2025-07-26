@@ -184,7 +184,7 @@ export class AdrRepository implements IAdrRepository {
     filter?: (f: AdrFile, s: AdrSlug) => boolean
   ): Promise<Adr[]> {
     const files = await fsP.readdir(p.absolutePath);
-    return Promise.all(
+    const adrs = await Promise.all(
       files
         .map((filename) => {
           return new FilesystemPath(
@@ -243,20 +243,45 @@ export class AdrRepository implements IAdrRepository {
                 lastEditDate,
                 lastEditAuthor: await this.getAnonymousAuthor()
               });
+            })
+            .catch((error: Error) => {
+              // Log error but don't fail the entire discovery process
+              // This ensures ADRs with different naming strategies can still be loaded
+              // eslint-disable-next-line no-console
+              console.warn(
+                `Failed to load ADR file ${adrFile.path.absolutePath}:`,
+                error.message
+              );
+              return null;
             });
         })
     );
+    // Filter out null values from failed ADR loads
+    return adrs.filter((adr): adr is Adr => adr !== null);
   }
 
   generateAvailableSlug(title: string, packageRef?: PackageRef): AdrSlug {
     const adrFolderPath = this.getAdrFolderPath(packageRef);
     const baseSlug = AdrSlug.createFromTitle(title, packageRef);
 
+    // For strategies that handle numbering internally (like project-id-number),
+    // we don't need to add suffixes
+    const namingStrategyId =
+      this.config.project.naming?.strategy || "date-prefix";
+    if (
+      namingStrategyId === "project-id-number" ||
+      namingStrategyId === "number-prefix"
+    ) {
+      return baseSlug;
+    }
+
+    // For other strategies (date-prefix, simple-title), we need to handle duplicates
     let i = 1;
     let slug: AdrSlug;
     let filename: string;
     do {
-      slug = new AdrSlug(`${baseSlug.value}${i > 1 ? `-${i}` : ""}`);
+      const suffix = i > 1 ? `-${i}` : "";
+      slug = new AdrSlug(`${baseSlug.value}${suffix}`);
       filename = `${slug.namePart}.md`;
       i += 1;
     } while (fs.existsSync(path.join(adrFolderPath.absolutePath, filename)));
@@ -298,6 +323,27 @@ export class AdrRepository implements IAdrRepository {
     });
 
     return maxNumber + 1;
+  }
+
+  /**
+   * Gets the list of existing ADR filenames for naming strategies.
+   */
+  getExistingAdrFiles(packageRef?: PackageRef): string[] {
+    const adrFolderPath = this.getAdrFolderPath(packageRef);
+
+    if (!fs.existsSync(adrFolderPath.absolutePath)) {
+      return [];
+    }
+
+    return fs
+      .readdirSync(adrFolderPath.absolutePath)
+      .filter((filename) => filename.endsWith(".md"))
+      .filter(
+        (filename) =>
+          !["template.md", "readme.md", "index.md", "backlog.md"].includes(
+            filename.toLowerCase()
+          )
+      );
   }
 
   /**
