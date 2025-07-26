@@ -1,5 +1,6 @@
 import { DatePrefixNamingStrategy } from "./DatePrefixNamingStrategy";
 import { NumberPrefixNamingStrategy } from "./NumberPrefixNamingStrategy";
+import { ProjectIdNumberNamingStrategy } from "./ProjectIdNumberNamingStrategy";
 import { SimpleTitleNamingStrategy } from "./SimpleTitleNamingStrategy";
 import { AdrNamingStrategyFactory } from "./AdrNamingStrategyFactory";
 import { PackageRef } from "../PackageRef";
@@ -78,6 +79,56 @@ describe("AdrNamingStrategy", () => {
     });
   });
 
+  describe("ProjectIdNumberNamingStrategy", () => {
+    const mockGetNextNumber = jest.fn();
+    const mockGetProjectId = jest.fn();
+    const strategy = new ProjectIdNumberNamingStrategy({
+      getNextNumber: mockGetNextNumber,
+      getProjectId: mockGetProjectId
+    });
+
+    beforeEach(() => {
+      mockGetNextNumber.mockClear();
+      mockGetProjectId.mockClear();
+    });
+
+    it("should generate slug with uppercase project ID and number", () => {
+      mockGetProjectId.mockReturnValue("myproj");
+      mockGetNextNumber.mockReturnValue(1);
+      const slug = strategy.generateSlug("Use Microservices Architecture");
+
+      expect(slug).toBe("MYPROJ-1-use-microservices-architecture");
+      expect(mockGetProjectId).toHaveBeenCalledWith(undefined);
+      expect(mockGetNextNumber).toHaveBeenCalledWith(undefined);
+    });
+
+    it("should convert project ID to uppercase", () => {
+      mockGetProjectId.mockReturnValue("frontend");
+      mockGetNextNumber.mockReturnValue(42);
+      const slug = strategy.generateSlug("Add User Authentication");
+
+      expect(slug).toBe("FRONTEND-42-add-user-authentication");
+    });
+
+    it("should include package reference when provided", () => {
+      mockGetProjectId.mockReturnValue("backend");
+      mockGetNextNumber.mockReturnValue(5);
+      const packageRef = new PackageRef("api");
+      const slug = strategy.generateSlug("Implement GraphQL API", packageRef);
+
+      expect(slug).toBe("api/BACKEND-5-implement-graphql-api");
+      expect(mockGetProjectId).toHaveBeenCalledWith(packageRef);
+      expect(mockGetNextNumber).toHaveBeenCalledWith(packageRef);
+    });
+
+    it("should provide correct strategy info", () => {
+      expect(strategy.getDisplayName()).toBe(
+        "Project ID + Number (PROJ-1-title)"
+      );
+      expect(strategy.getStrategyId()).toBe("project-id-number");
+    });
+  });
+
   describe("SimpleTitleNamingStrategy", () => {
     const strategy = new SimpleTitleNamingStrategy();
 
@@ -133,6 +184,25 @@ describe("AdrNamingStrategy", () => {
       expect(strategy).toBeInstanceOf(SimpleTitleNamingStrategy);
     });
 
+    it("should create ProjectIdNumberNamingStrategy with dependencies", () => {
+      const getNextNumber = jest.fn().mockReturnValue(1);
+      const getProjectId = jest.fn().mockReturnValue("test");
+      const strategy = AdrNamingStrategyFactory.create("project-id-number", {
+        getNextNumber,
+        getProjectId
+      });
+
+      expect(strategy).toBeInstanceOf(ProjectIdNumberNamingStrategy);
+    });
+
+    it("should throw error for ProjectIdNumberNamingStrategy without dependencies", () => {
+      expect(() => {
+        AdrNamingStrategyFactory.create("project-id-number");
+      }).toThrow(
+        "ProjectIdNumberNamingStrategy requires getNextNumber and getProjectId dependencies"
+      );
+    });
+
     it("should throw error for unknown strategy", () => {
       expect(() => {
         AdrNamingStrategyFactory.create("unknown-strategy");
@@ -145,7 +215,8 @@ describe("AdrNamingStrategy", () => {
       expect(strategies).toEqual([
         "date-prefix",
         "number-prefix",
-        "simple-title"
+        "simple-title",
+        "project-id-number"
       ]);
     });
   });

@@ -300,6 +300,21 @@ export class AdrRepository implements IAdrRepository {
     return maxNumber + 1;
   }
 
+  /**
+   * Gets the project ID for ProjectIdNumberNamingStrategy.
+   * Priority: config.project.naming.options.projectId > packageRef.name > config.project.name
+   */
+  getProjectId(packageRef?: PackageRef): string {
+    const namingOptions = this.config.project.naming?.options;
+    if (namingOptions?.projectId) {
+      return namingOptions.projectId as string;
+    }
+    if (packageRef) {
+      return packageRef.name;
+    }
+    return this.config.project.name;
+  }
+
   private getPackageRef(slug: AdrSlug): PackageRef | undefined {
     // undefined if global
     return slug.packagePart ? new PackageRef(slug.packagePart) : undefined;

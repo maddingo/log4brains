@@ -49,8 +49,16 @@ export function buildContainer(
       return adrRepository.getNextAdrNumber(packageRef);
     };
 
+    const getProjectId = (packageRef?: PackageRef): string => {
+      const adrRepository = container.resolve<repositories.AdrRepository>(
+        "adrRepository"
+      );
+      return adrRepository.getProjectId(packageRef);
+    };
+
     const strategy = AdrNamingStrategyFactory.create(namingConfig.strategy, {
-      getNextNumber
+      getNextNumber,
+      getProjectId
     });
 
     AdrSlug.setNamingStrategy(strategy);
