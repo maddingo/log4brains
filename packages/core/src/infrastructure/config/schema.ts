@@ -44,7 +44,13 @@ const adrNamingSchema = Joi.object({
   strategy: Joi.string()
     .valid(...AdrNamingStrategyFactory.getAvailableStrategies())
     .default("date-prefix"),
-  options: Joi.object().default({})
+  options: Joi.object({
+    projectId: Joi.string().when("...strategy", {
+      is: "project-id-number",
+      then: Joi.string().default("ADR"),
+      otherwise: Joi.string().optional()
+    })
+  }).default({})
 });
 
 type ProjectConfig = Readonly<{

@@ -302,7 +302,7 @@ export class AdrRepository implements IAdrRepository {
 
   /**
    * Gets the project ID for ProjectIdNumberNamingStrategy.
-   * Priority: config.project.naming.options.projectId > packageRef.name > config.project.name
+   * Priority: config.project.naming.options.projectId > packageRef.name > "ADR" (default)
    */
   getProjectId(packageRef?: PackageRef): string {
     const namingOptions = this.config.project.naming?.options;
@@ -312,7 +312,7 @@ export class AdrRepository implements IAdrRepository {
     if (packageRef) {
       return packageRef.name;
     }
-    return this.config.project.name;
+    return "ADR";
   }
 
   private getPackageRef(slug: AdrSlug): PackageRef | undefined {

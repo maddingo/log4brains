@@ -93,11 +93,11 @@ describe("AdrNamingStrategy", () => {
     });
 
     it("should generate slug with uppercase project ID and number", () => {
-      mockGetProjectId.mockReturnValue("myproj");
+      mockGetProjectId.mockReturnValue("ADR");
       mockGetNextNumber.mockReturnValue(1);
       const slug = strategy.generateSlug("Use Microservices Architecture");
 
-      expect(slug).toBe("MYPROJ-1-use-microservices-architecture");
+      expect(slug).toBe("ADR-1-use-microservices-architecture");
       expect(mockGetProjectId).toHaveBeenCalledWith(undefined);
       expect(mockGetNextNumber).toHaveBeenCalledWith(undefined);
     });
@@ -119,6 +119,14 @@ describe("AdrNamingStrategy", () => {
       expect(slug).toBe("api/BACKEND-5-implement-graphql-api");
       expect(mockGetProjectId).toHaveBeenCalledWith(packageRef);
       expect(mockGetNextNumber).toHaveBeenCalledWith(packageRef);
+    });
+
+    it("should use ADR as default project ID", () => {
+      mockGetProjectId.mockReturnValue("ADR");
+      mockGetNextNumber.mockReturnValue(5);
+      const slug = strategy.generateSlug("Add Authentication System");
+
+      expect(slug).toBe("ADR-5-add-authentication-system");
     });
 
     it("should provide correct strategy info", () => {
